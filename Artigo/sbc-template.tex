@@ -3,13 +3,16 @@
 \usepackage{sbc-template}
 \usepackage{graphicx,url}
 \usepackage[brazil]{babel}   
-\usepackage[latin1]{inputenc}
+%\usepackage[latin1]{inputenc}
 \usepackage{enumitem}
 \usepackage{placeins}
+\usepackage{natbib}
 
 \hyphenation{english terms to not hyphenize various non repeatable words here something like long word Portuguese}
      
 \sloppy
+
+
 
 \title{Instructions for Authors of SBC Conferences\\ Papers and Abstracts}
 
@@ -39,6 +42,7 @@
 }
 
 \begin{document} 
+
 
 \maketitle
 
@@ -73,51 +77,50 @@ points of space before each paragraph. Page numbers must be suppressed.
 Full papers must respect the page limits defined by the conference.
 Conferences that publish just abstracts ask for \textbf{one}-page texts.
 
-\section{Fundamentação Teórica} 
+\section{Fundamentação Teórica} \label{sec:firstpage}
 \subsection{Computação Paralela}
-Do período de 1986 até 2002, o desempenho dos processadores aumentava cerca de 52\% a cada ano[1]. No entanto, desde 2002 o crescimento de desempenho das novas gerações de microprocessadores tem desacelarado cada vez mais, isso devido ao limite físico do silício[2]. Desse modo, por volta de 2005, a grande maioria das fabricantes de microprocessadores decidiu que o caminho para o ganho de desempenho estava direcionado a programação paralela [PACHECO, 2011].
+Do período de 1986 até 2002, o desempenho dos processadores aumentava cerca de 52\% a cada ano \citep{herlihy2008}. No entanto, desde 2002 o crescimento de desempenho das novas gerações de microprocessadores tem desacelerado cada vez mais, isso se deve ao limite físico do silício \citep{hennessy2017}. Desse modo, por volta de 2005, a grande maioria das fabricantes de microprocessadores decidiu que o caminho para o ganho de desempenho estava direcionado à programação paralela \citep{pacheco2011}.
 \par
-Pacheco [2011] aponta que na computação paralela "um programa é aquele no qual múltiplas tarefas cooperam intimamente para resolver um problema". Nesse sentido, operações matriciais representam um problema adequado para o paralelismo, já que o cálculo de elementos diferentes, podem ser distribuídos em diferentes unidades de execução.
+\citep{pacheco2011} aponta que na computação paralela "um programa é aquele no qual múltiplas tarefas cooperam intimamente para resolver um problema". Nesse sentido, operações matriciais representam um problema adequado para o paralelismo, já que o cálculo de elementos diferentes podem ser distribuídos em diferentes unidades de execução.
 
 \subsection{Threads e Paralelismo}
-O conceito de \textit{thread} pode ser definido como uma linha de execução de um processo [3]. Comumente, existem dois tipos de paralelismo, o paralelismo de dados e de tarefas. O paralelismo de dados está relacionado a distribuição de subconjuntos de um mesmo dado entre multíplos processadores. Já o paralelismo de tarefas envolve a distribuição de \textit{threads} entre os núcleos. [Silberschatz et al., 2018]. Nesse sentido, o problema clássico da  multiplicação de matrizes é explorada como um problema de paralelismo de dados, uma vez que diferentes elementos da matriz resultante podem ser calculados de maneira independente.
+O conceito de \textit{thread} pode ser definido como uma linha de execução de um processo \cite{tanenbaum2016}. Comumente, existem dois tipos de paralelismo, o paralelismo de dados e de tarefas. O paralelismo de dados está relacionado a distribuição de subconjuntos de um mesmo dado entre multíplos processadores. Já o paralelismo de tarefas envolve a distribuição de \textit{threads} entre os núcleos. \cite{silberschatz2018}. Nesse sentido, o problema clássico da  multiplicação de matrizes é explorado como um problema de paralelismo de dados, uma vez que diferentes elementos da matriz resultante podem ser calculados de maneira independente.
 
 \subsection{Multiplicação de Matrizes}
-De acordo com Cormen et al. [2012], o problema clássico para multiplicação de matrizes envolve duas matrizes dadas, A e B, e C uma nova matriz a ser calculada. A operação que define cada elemento $C_{ij}$ pode ser dada como:
+De acordo com \cite{cormen2012}, o problema clássico para multiplicação de matrizes envolve duas matrizes dadas, A e B, e C uma nova matriz a ser calculada. A operação que define cada elemento $C_{ij}$ pode ser dada como:
 \begin{equation}
 C_{ij} = \sum_{k=1}^{n} A_{ik}B_{kj}
 \end{equation}
 \par
 Ou seja, cada elemento $C_{ij}$ é obtido pelo produto escalar entre a linha $i$
-de A e a coluna $j$ de B. Dessa forma, o algoritmo sequencial possui um custo $O(n^3)$, para matrizes de dimensão N por N. 
+de A e a coluna $j$ de B. Dessa forma, o algoritmo sequencial possui um custo $O(n^3)$ para matrizes de dimensão N por N. 
 \subsection{Princípio da localidade espacial}
-Hennessy e Patterson, [2017] mostram que segundo o princípio da localidade espacial, quando um dado é acessado, existe uma grande possibilidade dos dados armazenados próximos serem necessários. Dessa forma, quando um dado não é encontrado em \textit{cache}, o processador busca um bloco de dados próximos ao dado na memória.
+\cite{hennessy2017} mostram que segundo o princípio da localidade espacial, quando um dado é acessado, existe uma grande possibilidade dos dados armazenados próximos serem necessários. Dessa forma, quando um dado não é encontrado em \textit{cache}, o processador busca um bloco de dados próximos ao dado na memória principal.
 \par
-Nesse sentido, segundo o cppreference.com [2026], matrizes multidimensionais são armazenadas em ordem \textit{row-major}, ou seja, os elementos de uma mesma linha ocupam posições consecutivas na memória. Por conseguinte, percorrer os elementos de uma linha de forma consecutiva, tende a favorecer a localidade espacial, já percorrer por columa desfavorece o aproveitamento de dados em \textit{cache}.
+Nesse sentido, segundo \cite{cppreference_array}, em C/C++ as matrizes multidimensionais são armazenadas em ordem \textit{row-major}, ou seja, os elementos de uma mesma linha ocupam posições consecutivas na memória. Por conseguinte, percorrer os elementos de uma linha de forma consecutiva, tende a favorecer a localidade espacial, já percorrer por coluna desfavorece o aproveitamento de dados em \textit{cache}.
 \subsection{Transposição de matrizes}
 \par
-No cenário de multiplicação de matrizes o acesso a memória da matriz B terá um custo maior que A. Assim, a transposição da matriz, definido por Cormen et al. [2012] como a permutação dos elementos de cada i-ésima linha, pela j-ésima coluna, pode resolver o problema do armazenamento na memória, alterando apenas a forma de cálculo da matriz C para manter o resultando, computando com os elementos da linha "$j$" ao invés da coluna.   
+No cenário de multiplicação de matrizes o acesso à memória da matriz B terá um custo maior que A. Assim, a transposição da matriz, definido por \cite{cormen2012} como a permutação dos elementos de cada i-ésima linha, pela j-ésima coluna, pode resolver o problema do armazenamento na memória, alterando apenas a forma de cálculo da matriz C para manter o resultado, computando com os elementos da linha "$j$" ao invés da coluna.   
 
 \subsection{Métricas de Desempenho}
 Para validação de desempenho, é importante utilizar métricas adequadas, de modo a avaliar corretamente o benefício ou não do uso de paralelismo. Entre as principais métricas para avaliação do desempenho de algoritmos, temos: Tempo de execução; \textit{Overhead} paralelo total; \textit{Speedup}; Eficiência;
 \par
-Grama et al. [2003] definem o tempo de execução de um algoritmo sequencial como o tempo decorrido entre o início e o fim de sua execução em um computador sequencial. Já o tempo de execução de um algoritmo paralelo é definido como o tempo decorrido a partir do momento em que a computação paralela se inicia, até o momento da execução do último elemento de processamento. Indicamos o tempo de execução sequencial como $T_s$ e o tempo de execução paralelo por $T_p$.
+\cite{grama2003} definem o tempo de execução de um algoritmo sequencial como o tempo decorrido entre o início e o fim de sua execução em um computador sequencial. Já o tempo de execução de um algoritmo paralelo é definido como o tempo decorrido a partir do momento em que a computação paralela se inicia até o momento da execução do último elemento de processamento. Indicamos o tempo de execução sequencial como $T_s$ e o tempo de execução paralelo por $T_p$.
 \par
-Os custos computacionais adicionados devido à paralelização são encapsulados em uma expressão chamada \textit{overhead}. Que pode ser definida como o tempo total gasto por todos elementos coletivamente, além do tempo necessário pelo algoritmo sequencial [Grama et al. 2003]. Dessa forma, o sendo $p$ o número de \textit{threads} \textit{overhead} paralelo total pode ser calculado como:
+Os custos computacionais adicionados devido à paralelização são encapsulados em uma expressão chamada \textit{overhead}, que pode ser definida como o tempo total gasto por todos elementos coletivamente, além do tempo necessário pelo algoritmo sequencial \cite{grama2003}. Dessa forma, sendo $p$ o número de \textit{threads} \textit{overhead} paralelo total pode ser calculado como:
 \begin{equation}
 T_o = pT_p - T_s
 \end{equation}
 \par
-\textit{Speedup} é a medida que mostra o benefício relativo de programar paralelamente em relação ao programa sequencial [Grama et al. 2003]. Assim, o \textit{Speedup} do sistema pode ser calculado como a razão do tempo de execução sequencial pelo tempo em paralelo como na equação abaixo:  
+\textit{Speedup} é a medida que mostra o benefício relativo de programar paralelamente em relação ao programa sequencial \cite{grama2003}. Assim, o \textit{Speedup} do sistema pode ser calculado como a razão do tempo de execução sequencial pelo tempo em paralelo como na equação abaixo:  
 \begin{equation}
 S_p = \frac{T_s}{T_p}
 \end{equation}
 \par
-Já a eficiência é uma medida da fração de tempo na qual um elemento de processamento está realmente utilmente empregado [Grama et al. 2003]. A eficiência pode ser calculada como:
+Já a eficiência é uma medida da fração de tempo na qual um elemento de processamento está utilmente empregado \cite{grama2003}. A eficiência pode ser calculada como:
 \begin{equation}
 E_p = \frac{T_s}{pT_p}.
 \end{equation}
-
 \section{CD-ROMs and Printed Proceedings}
 
 In some conferences, the papers are published on CD-ROM while only the
