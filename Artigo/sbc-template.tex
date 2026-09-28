@@ -2,8 +2,10 @@
 
 \usepackage{sbc-template}
 \usepackage{graphicx,url}
-\usepackage[brazil]{babel}   
-\usepackage[latin1]{inputenc}
+
+\usepackage[T1]{fontenc} 
+\usepackage[brazilian]{babel}   
+\usepackage[utf8]{inputenc}
 \usepackage{enumitem}
 \usepackage{placeins}
 
@@ -17,22 +19,22 @@
 	Luciana P. Nedel
 		\thanks{Info about your graduation, post-graduation, master course, PhD, etc. HERE} \inst{1}
 	, Rafael H. Bordini 
-		\thanks{Informa��o sobre Gradua��es, P�s-gradua��es, Mestrados e etc., incluindo as institui��es AQUI} \inst{2}
-	, Fl�vio Rech Wagner 
-		\thanks{Informa��o sobre Gradua��es, P�s-gradua��es, Mestrados e etc., incluindo as institui��es AQUI} \inst{1}
-	, Jomi F. H�bner 
-		\thanks{Informa��o sobre Gradua��es, P�s-gradua��es, Mestrados e etc., incluindo as institui��es AQUI} \inst{3} 
+    \thanks{Informação sobre Graduações, Pós-graduações, Mestrados e etc., incluindo as instituições AQUI} \inst{2}
+  , Flávio Rech Wagner
+    \thanks{Informação sobre Graduações, Pós-graduações, Mestrados e etc., incluindo as instituições AQUI} \inst{1}
+  , Jomi F. Hübner
+    \thanks{Informação sobre Graduações, Pós-graduações, Mestrados e etc., incluindo as instituições AQUI} \inst{3}
 }
 
 
-\address{Instituto de Inform�tica -- Universidade Federal do Rio Grande do Sul
+\address{Instituto de Informática -- Universidade Federal do Rio Grande do Sul
   (UFRGS)\\
   Caixa Postal 15.064 -- 91.501-970 -- Porto Alegre -- RS -- Brazil
 \nextinstitute
   Department of Computer Science -- University of Durham\\
   Durham, U.K.
 \nextinstitute
-  Departamento de Sistemas e Computa��o\\
+  Departamento de Sistemas e Computação\\
   Universidade Regional de Blumenal (FURB) -- Blumenau, SC -- Brazil
   \email{\{nedel,flavio\}@inf.ufrgs.br, R.Bordini@durham.ac.uk,
   jomi@inf.furb.br}
@@ -51,13 +53,13 @@
 \end{abstract}
      
 \begin{resumo} 
-  Este meta-artigo descreve o estilo a ser usado na confec��o de artigos e
-  resumos de artigos para publica��o nos anais das confer�ncias organizadas
-  pela SBC. � solicitada a escrita de resumo e abstract apenas para os artigos
-  escritos em portugu�s. Artigos em ingl�s dever�o apresentar apenas abstract.
+  Este meta-artigo descreve o estilo a ser usado na confecção de artigos e
+  resumos de artigos para publicação nos anais das conferências organizadas
+  pela SBC. É solicitada a escrita de resumo e abstract apenas para os artigos
+  escritos em português. Artigos em inglês deverão apresentar apenas abstract.
   Nos dois casos, o autor deve tomar cuidado para que o resumo (e o abstract)
-  n�o ultrapassem 10 linhas cada, sendo que ambos devem estar na primeira
-  p�gina do artigo.
+  não ultrapassem 10 linhas cada, sendo que ambos devem estar na primeira
+  página do artigo.
 \end{resumo}
 
 
@@ -118,13 +120,28 @@ Já a eficiência é uma medida da fração de tempo na qual um elemento de proc
 E_p = \frac{T_s}{pT_p}.
 \end{equation}
 
-\section{CD-ROMs and Printed Proceedings}
 
-In some conferences, the papers are published on CD-ROM while only the
-abstract is published in the printed Proceedings. In this case, authors are
-invited to prepare two final versions of the paper. One, complete, to be
-published on the CD and the other, containing only the first page, with
-abstract and ``resumo'' (for papers in Portuguese).
+\section{Trabalhos Relacionados}
+
+\subsection{Parallel matrix transpose algorithms on distributed memory concurrent computers}
+
+\par O artigo “Parallel matrix transpose algorithms on distributed memory concurrent computers” \cite{art1} trata da criação de um algorítimo referente à realização de operações de transposição de matrizes utilizando-se de computação paralela.
+\par Para realizar o procedimento, o algoritimo separa os processadores disponíveis em uma matriz de duas dimensões e, utilizando distribuição de dados bloco-cíclica (block cyclic data distribution), divide sub-seções da matriz a serem analisadas por processadores específicos. 
+\par Dependendo da divisão dos processadores na representação 2D, sendo P o número de linhas e Q o número de colunas, duas situações distintas podem ocorrer: o máximo divisor comum (MDC) entre P e Q é calculado. Caso ele seja igual a 1, os números são matematicamente primos, e todos os processadores precisam realizar os procedimentos realizando ‘comunicação total’ entre si. 
+\par Caso o MDC seja maior que 1, o algorítimo divide os blocos de processadores em grupos delimitados pelo MDC, nos quais todas as operações de transposição entre blocos de mesmo grupo podem ocorrer simultaneamente, diminuindo a quantidade total de tempo de execução.
+\par A análise final do algorítimo realizada no artigo demonstra que, em uma múltiplicação de matrizes, transpor o resultado da operação utilizando o processo descrito aumenta em pouco o tempo total de execução. Ademais, o algoritimo se destaca, em principal, ao suportar versatilidade quanto a proporções em grades bidimensionais não quadradas (com P diferente de Q), não só mantendo alta eficiência, mas superando algoritimos restritos a arranjos quadrados.
+\par Um ponto negativo observável no algoritimo, no entanto, possui uma descrição breve no artigo em si. Quando P e Q tem MDC igual a 1 e a comunicação total é realizada, a sua implementação é não só mais lenta do que o método com MDC maior, mas também não se utiliza da melhor implementação possível em teoria. Os autores optam por uma implementação não óptima que, dada a quantidade arbtirariamente grande de processadores, seria mais simples de ser utilizada.
+
+\subsection{Anatomy of High-Performance Matrix Multiplication}
+\par Outro artigo mais diretamente relacionado ao tópico é “Anatomy of High-Performance Matrix Multiplication” \cite{art2}, que discorre diretamente sobre implementações otimizadas de operações de multiplicação de matriz, mais especificamente sobre gerenciar de maneira eficiente a hierarquia de memória disponível para obter alto desempenho de maneira consistente.
+\par Os autores identificam que, nas abordagens mais tradicionais, os algoritimos criados não condizem às capacidades reais do hardware ao mensurar performance, como o número finito de entradas no Translation Look-aside Buffer (TLB) e as latências das memórias cache. O algorítimo proposto, portanto, busca segmentar mais o problema utilizando empacotamento a fim de aproveitar mais a memória no nível local.
+\par Para evitar os gargalos de memória descritos, o sistema proposto reestrutura o algoritimo comum da GEMM (General Matriz Multiplication) em níveis distintos: no mais alto nível, a matriz de entrada é particionada de modo que o painel da matriz A é dimensionado para se ajustar ao cache L2 (ou L3) e ao limite de entradas do TLB, enquanto os blocos da matriz B são empacotados para fluir diretamente pelo cache L1.
+\par Em nível de bloco, os dados lhe atribuídos passam pelo processo de empacotamento, a partir do qual os pacotes são inseridos em buffers temporários contíguos, para que o acesso a eles possa ser mais rápido e direto no processamento.
+\par No micro-kernel, o processamento é realizado em pequenas submatrizes, maximizando a instrução vetorial e o paralelismo ao nível de instrução, O artigo apresenta variados experimentos que demonstram o aumento de desempenho dado por sua abordagem, e é uma base fundamental para análise referente às operações fundamentais de GEMM, e o algorítimo é utilizado em múltiplas bibliotecas atuais de computação de alta performance (HPC), como OpenBLAS  e Intel MKL.
+\par Apesar da alta eficiência do procedimento, um ponto negativo observável é que o processo é bastante elaborado e, portanto, contém overhead significativo. Dado que os procedimentos buscam utilizar o máximo possível de performance, o algoritimo é projetado para uma quantidade grande de processamento necessário e, caso a operação seja simples, as soluções implementadas seriam mais custosas do que óptimas em totalidade.
+
+\subsection{Relação com o Projeto Principal}
+\par Os artigos descritos, para o propósito deste projeto, apresentam não apenas algoritmos eficientes em suas respectivas áreas de ênfase (transposição e multiplicação de matrizes), mas também demonstram, ao longo de suas análises, diversas estratégias de gerenciamento de recursos do sistema para otimizar processos dependentes de matrizes. Dessa forma, mesmo que o presente trabalho não consista em uma reconstrução direta de nenhum dos métodos, ambos os artigos contêm esquemas de particionamento e análise bastante úteis para o desenvolvimento de nosso projeto.
 
 \section{Sections and Paragraphs}
 
@@ -203,7 +220,7 @@ Paulo: Pearson, 2016.
 
 [7] CORMEN, Thomas H. et al. Algoritmos: teoria e prática. 3. ed. Rio de Janeiro: Elsevier, 2012.
 
-[8] CPPREFERENCE.COM. Array declaration. [S. l.]: cppreference.com, 2026. Disponível em: https://en.cppreference.com/w/c/language/array⁠. Acesso em: 26 set. 2026.
+[8] CPPREFERENCE.COM. Array declaration. [S. l.]: cppreference.com, 2026. Disponível em: https://en.cppreference.com/w/c/language/array. Acesso em: 26 set. 2026.
 
 Bibliographic references must be unambiguous and uniform.  We recommend giving
 the author names references in brackets, e.g. \cite{knuth:84},
