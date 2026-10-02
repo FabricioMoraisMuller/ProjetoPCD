@@ -84,9 +84,9 @@ Conferences that publish just abstracts ask for \textbf{one}-page texts.
 Do período de 1986 até 2002, o desempenho dos processadores aumentava cerca de 52\% a cada ano \citep{herlihy2008}. No entanto, desde 2002 o crescimento de desempenho das novas gerações de microprocessadores tem desacelerado cada vez mais, isso se deve ao limite físico do silício \citep{hennessy2017}. Desse modo, por volta de 2005, a grande maioria das fabricantes de microprocessadores decidiu que o caminho para o ganho de desempenho estava direcionado à programação paralela \citep{pacheco2011}.
 \par
 \citep{pacheco2011} aponta que na computação paralela "um programa é aquele no qual múltiplas tarefas cooperam intimamente para resolver um problema". Nesse sentido, operações matriciais representam um problema adequado para o paralelismo, já que o cálculo de elementos diferentes podem ser distribuídos em diferentes unidades de execução.
-
-\subsection{Threads e Paralelismo}
-O conceito de \textit{thread} pode ser definido como uma linha de execução de um processo \cite{tanenbaum2016}. Comumente, existem dois tipos de paralelismo, o paralelismo de dados e de tarefas. O paralelismo de dados está relacionado a distribuição de subconjuntos de um mesmo dado entre multíplos processadores. Já o paralelismo de tarefas envolve a distribuição de \textit{threads} entre os núcleos. \cite{silberschatz2018}. Nesse sentido, o problema clássico da  multiplicação de matrizes é explorado como um problema de paralelismo de dados, uma vez que diferentes elementos da matriz resultante podem ser calculados de maneira independente.
+% Se houver espaço
+%\subsection{Threads e Paralelismo}
+%O conceito de \textit{thread} pode ser definido como uma linha de execução de um processo \cite{tanenbaum2016}. Comumente, existem dois tipos de paralelismo, o paralelismo de dados e de tarefas. O paralelismo de dados está relacionado a distribuição de subconjuntos de um mesmo dado entre multíplos processadores. Já o paralelismo de tarefas envolve a distribuição de \textit{threads} entre os núcleos. \cite{silberschatz2018}. Nesse sentido, o problema clássico da  multiplicação de matrizes é explorado como um problema de paralelismo de dados, uma vez que diferentes elementos da matriz resultante podem ser calculados de maneira independente.
 
 \subsection{Multiplicação de Matrizes}
 De acordo com \cite{cormen2012}, o problema clássico para multiplicação de matrizes envolve duas matrizes dadas, A e B, e C uma nova matriz a ser calculada. A operação que define cada elemento $C_{ij}$ pode ser dada como:
@@ -102,12 +102,20 @@ de A e a coluna $j$ de B. Dessa forma, o algoritmo sequencial possui um custo $O
 Nesse sentido, segundo \cite{cppreference_array}, em C/C++ as matrizes multidimensionais são armazenadas em ordem \textit{row-major}, ou seja, os elementos de uma mesma linha ocupam posições consecutivas na memória. Por conseguinte, percorrer os elementos de uma linha de forma consecutiva, tende a favorecer a localidade espacial, já percorrer por coluna desfavorece o aproveitamento de dados em \textit{cache}.
 \subsection{Transposição de matrizes}
 \par
-No cenário de multiplicação de matrizes o acesso à memória da matriz B terá um custo maior que A. Assim, a transposição da matriz, definido por \cite{cormen2012} como a permutação dos elementos de cada i-ésima linha, pela j-ésima coluna, pode resolver o problema do armazenamento na memória, alterando apenas a forma de cálculo da matriz C para manter o resultado, computando com os elementos da linha "$j$" ao invés da coluna.   
+No cenário de multiplicação de matrizes o acesso à memória da matriz B terá um custo maior que A. Assim, a transposição da matriz, definido por \cite{cormen2012} como a permutação dos elementos de cada i-ésima linha, pela j-ésima coluna, pode resolver o problema do armazenamento na memória, alterando apenas a forma de cálculo da matriz C para manter o resultado, computando com os elementos da linha "$j$" ao invés da coluna. 
+
+\subsection{Algoritmo de Strassen para multiplicação de matrizes}
+Segundo \cite{ikenmeyer2019strassen} o algoritmo de Strassen para multiplicação de matrizes foi uma descoberta revolucionária na álgebra linear computacional. A ideia central desse algoritmo é multiplicar matrizes de tamanho 2X2 com apenas 7 operações, utilizando a estratégia de divisão e conquista aplicar a matrizes N x N. O algoritmo surge da decomposição da forma: 
+\begin{equation}
+XY = \sum_{k=1}^{7} u_{k}(X)v_{k}(Y)W_{k}
+\end{equation}
+\par
+Em que $u_k$ e $v_k$ são formas lineares escolhidas no espaço das matrizes 2X2 e $W_k$ são sete matrizes de tamanho 2X2. Aplicando esse algoritmo é possível reduzir o custo computacional para $O(n^{\log_{2}7})$ operações aritméticas \cite{ikenmeyer2019strassen}.
 
 \subsection{Métricas de Desempenho}
-Para validação de desempenho, é importante utilizar métricas adequadas, de modo a avaliar corretamente o benefício ou não do uso de paralelismo. Entre as principais métricas para avaliação do desempenho de algoritmos, temos: Tempo de execução; \textit{Overhead} paralelo total; \textit{Speedup}; Eficiência;
+ Entre as principais métricas para avaliação do desempenho de algoritmos destacam-se: Tempo de execução; \textit{Overhead} paralelo total; \textit{Speedup}; Eficiência;
 \par
-\cite{grama2003} definem o tempo de execução de um algoritmo sequencial como o tempo decorrido entre o início e o fim de sua execução em um computador sequencial. Já o tempo de execução de um algoritmo paralelo é definido como o tempo decorrido a partir do momento em que a computação paralela se inicia até o momento da execução do último elemento de processamento. Indicamos o tempo de execução sequencial como $T_s$ e o tempo de execução paralelo por $T_p$.
+\cite{grama2003} definem o tempo de execução de um algoritmo sequencial $T_s$ como o tempo decorrido entre o início e o fim de sua execução em um computador sequencial. Já o tempo de execução de um algoritmo paralelo $T_p$ é definido como o tempo decorrido a partir do momento em que a computação paralela se inicia até o momento da execução do último elemento de processamento.
 \par
 Os custos computacionais adicionados devido à paralelização são encapsulados em uma expressão chamada \textit{overhead}, que pode ser definida como o tempo total gasto por todos elementos coletivamente, além do tempo necessário pelo algoritmo sequencial \cite{grama2003}. Dessa forma, sendo $p$ o número de \textit{threads} \textit{overhead} paralelo total pode ser calculado como:
 \begin{equation}
@@ -205,34 +213,6 @@ internet, etc.). The image resolution on paper should be about 600 dpi for
 black-and-white images, and 150-300 dpi for grayscale images.  Do not include
 images with excessive resolution, as they may take hours to print, without any
 visible difference in the result. 
-
-\section{References}
-
-[1] M. Herlihy, N. Shavit, The Art of Multiprocessor Programming, Morgan Kaufmann,
-Boston, 2008.
-
-[2] "Computer Architecture: A Quantitative Approach" – John L. Hennessy e David A. Patterson.
-
-[3] PACHECO, Peter. An Introduction to Parallel Programming. San Francisco: Morgan Kaufmann, 2011.
-
-[4] GRAMA, Ananth; GUPTA, Anshul; KARYPIS, George; KUMAR, Vipin. Introduction to Parallel Computing. 2. ed. Harlow: Addison-Wesley/Pearson Education, 2003.
-
-[5] SILBERSCHATZ, Abraham; GALVIN, Peter B.; GAGNE, Greg. Operating System Concepts. 10. ed. Hoboken: Wiley, 2018.
-
-[6] TANENBAUM, A. S.; BOS, H. Sistemas operacionais modernos. 4. ed. São
-Paulo: Pearson, 2016.
-
-[7] CORMEN, Thomas H. et al. Algoritmos: teoria e prática. 3. ed. Rio de Janeiro: Elsevier, 2012.
-
-[8] CPPREFERENCE.COM. Array declaration. [S. l.]: cppreference.com, 2026. Disponível em: https://en.cppreference.com/w/c/language/array. Acesso em: 26 set. 2026.
-
-Bibliographic references must be unambiguous and uniform.  We recommend giving
-the author names references in brackets, e.g. \cite{knuth:84},
-\cite{boulic:91}, and \cite{smith:99}.
-
-The references must be listed using 12 point font size, with 6 points of space
-before each reference. The first line of each reference should not be
-indented, while the subsequent should be indented by 0.5 cm.
 
 \bibliographystyle{sbc}
 \bibliography{sbc-template}
