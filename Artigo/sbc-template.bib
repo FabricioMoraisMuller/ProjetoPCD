@@ -1,3 +1,32 @@
+@article{art1,
+title = {Parallel matrix transpose algorithms on distributed memory concurrent computers},
+journal = {Parallel Computing},
+volume = {21},
+number = {9},
+pages = {1387-1405},
+year = {1995},
+issn = {0167-8191},
+doi = {https://doi.org/10.1016/0167-8191(95)00016-H},
+url = {https://www.sciencedirect.com/science/article/pii/016781919500016H},
+author = {Jaeyoung Choi and Jack J. Dongarra and David W. Walker},
+keywords = {Linear algebra, Matrix transpose algorithm, Distributed memory multiprocessors, Point-to-point communication, Intel Touchstone Delta},
+abstract = {This paper describes parallel matrix transpose algorithms on distributed memory concurrent processors. We assume that the matrix is distributed over a P × Q processor template with a block cyclic data distribution. P, Q, and the block size can be arbitrary, so the algorithms have wide applicability. The communication schemes of the algorithms are determined by the greatest common divisor (GCD) of P and Q. If P and Q are relatively prime, the matrix transpose algorithm involves complete exchange communication. If P and Q are not relatively prime, processors are divided into GCD groups and the communication operations are overlapped for different groups of processors. Processors transpose GCD wrapped diagonal blocks simultaneously, and the matrix can be transposed with LCM/GCD steps, where LCM is the least common multiple of P and Q. The algorithms make use of non-blocking, point-to-point communication between processors. The use of nonblocking communication allows a processor to overlap the messages that it sends to different processors, thereby avoiding unnecessary synchronization. Combined with the matrix multiplication routine, C = A · B, the algorithms are used to compute parallel multiplications of transposed matrices, C = AT · BT, in the PUMMA package [5]. Details of the parallel implementation of the algorithms are given, and results are presented for runs on the Intel Touchstone Delta computer.}
+}
+
+@Article{art2,
+  author = {Goto, Kazushige and Geijn, Robert A. van de},
+  title = {Anatomy of high-performance matrix multiplication},
+  year = {2008},
+  issue_date = {May 2008},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {34},
+  number = {3},
+  issn = {0098-3500},
+  url = {https://doi.org/10.1145/1356052.1356053},
+  doi = {10.1145/1356052.1356053},
+}
+
 @Book{knuth:84,
   author = 	 {Donald E. Knuth},
   title = 	 {The {\TeX} Book},
@@ -91,3 +120,5 @@
   year = 	 {1999},
   editor = 	 {A. B. Smith-Jones}
 }
+
+
