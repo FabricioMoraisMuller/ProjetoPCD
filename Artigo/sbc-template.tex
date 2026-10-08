@@ -96,6 +96,11 @@ C_{ij} = \sum_{k=1}^{n} A_{ik}B_{kj}
 \par
 Ou seja, cada elemento $C_{ij}$ é obtido pelo produto escalar entre a linha $i$
 de A e a coluna $j$ de B. Dessa forma, o algoritmo sequencial possui um custo $O(n^3)$ para matrizes de dimensão N por N. 
+\subsection{Vetorização}
+Segundo \cite{allen2002} vetorização foi uma das técnicas que permitiram com que resultados ideais em diversas arquiteturas paralelas ocorresem para multiplicação de matrizes. A vetorização é uma técnica que permite explorar o paralelismo a nível de dados por meio de instruções SIMD (\textit{Single Instruction, Multiple Data}), ou seja, operação de múltiplos dados sobre a mesma instrução \cite{hennessy2017}. 
+\par
+Na vetorização automática o compilador identifica trechos específicos do código como laços de repetição, em que as operações podem ser realizadas de forma paralela em nível de instrução, e os transformam em instruções vetoriais compatíveis com os recursos do processador. Dessa forma, é possível reduzir o número de instruções para processar um conjunto de dados, melhorando o tempo de execução de programas, permitindo com que a multiplicação de matrizes seja executado em tempo ideal \cite{intel2023vectorization}. 
+
 \subsection{Princípio da localidade espacial}
 \cite{hennessy2017} mostram que segundo o princípio da localidade espacial, quando um dado é acessado, existe uma grande possibilidade dos dados armazenados próximos serem necessários. Dessa forma, quando um dado não é encontrado em \textit{cache}, o processador busca um bloco de dados próximos ao dado na memória principal.
 \par
