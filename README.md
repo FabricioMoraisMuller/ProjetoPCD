@@ -20,3 +20,12 @@
 * **tempo_cblas_s**: Tempo de execução da função CBLAS de referência, em segundos.
 * **gflops_cblas**: Taxa de GFLOPS alcançada pela referência CBLAS.
 * **status**: Validação do resultado calculado comparado à CBLAS (`OK` ou `ERRO`).
+
+# Resultados
+* resultados_benchmark_executado_2_threads_colab.cvs - Executado em no Colab com:
+Sistema Operacional : Linux 6.6.122+
+Arquitetura         : x86_64
+vCPUs (Lógicas)     : 2
+vCPUs (Disponíveis) : 2
+Modelo do Processador: Intel(R) Xeon(R) CPU @ 2.20GHz
+Memória RAM Total   : 12.67 GB
