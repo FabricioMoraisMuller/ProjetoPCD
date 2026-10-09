@@ -15,69 +15,36 @@
 \sloppy
 
 
+\title{Relatório de Programação Concorrente e Distribuida}
 
-\title{Instructions for Authors of SBC Conferences\\ Papers and Abstracts}
+\author{Ana L. Tomita\inst{1}, Fabricio M. Muller\inst{1}, Gabriel A. Garcia\inst{1}, \\Gabriel V. F. do Carmo\inst{1}, Loren P. R. Lorenzetto\inst{1}. }
 
-\author{
-	Luciana P. Nedel
-		\thanks{Info about your graduation, post-graduation, master course, PhD, etc. HERE} \inst{1}
-	, Rafael H. Bordini 
-    \thanks{Informação sobre Graduações, Pós-graduações, Mestrados e etc., incluindo as instituições AQUI} \inst{2}
-  , Flávio Rech Wagner
-    \thanks{Informação sobre Graduações, Pós-graduações, Mestrados e etc., incluindo as instituições AQUI} \inst{1}
-  , Jomi F. Hübner
-    \thanks{Informação sobre Graduações, Pós-graduações, Mestrados e etc., incluindo as instituições AQUI} \inst{3}
-}
-
-
-\address{Instituto de Informática -- Universidade Federal do Rio Grande do Sul
-  (UFRGS)\\
-  Caixa Postal 15.064 -- 91.501-970 -- Porto Alegre -- RS -- Brazil
-\nextinstitute
-  Department of Computer Science -- University of Durham\\
-  Durham, U.K.
-\nextinstitute
-  Departamento de Sistemas e Computação\\
-  Universidade Regional de Blumenal (FURB) -- Blumenau, SC -- Brazil
-  \email{\{nedel,flavio\}@inf.ufrgs.br, R.Bordini@durham.ac.uk,
-  jomi@inf.furb.br}
+\address{Instituto de Ciência e Tecnologia -- Universidade Federal de São Paulo
+  (Unifesp)
+  \email{\{%
+    gabriel.almeida12,%
+    rafael.lorenzetto,%
+    gabriel.fabri,%
+    tomita.ana,%
+    fmmuller%
+    }
+    \email{
+    \}@unifesp.br}
 }
 
 \begin{document} 
 
 
 \maketitle
-
-\begin{abstract}
-  This meta-paper describes the style to be used in articles and short papers
-  for SBC conferences. For papers in English, you should add just an abstract
-  while for the papers in Portuguese, we also ask for an abstract in
-  Portuguese (``resumo''). In both cases, abstracts should not have more than
-  10 lines and must be in the first page of the paper.
-\end{abstract}
      
 \begin{resumo} 
-  Este meta-artigo descreve o estilo a ser usado na confecção de artigos e
-  resumos de artigos para publicação nos anais das conferências organizadas
-  pela SBC. É solicitada a escrita de resumo e abstract apenas para os artigos
-  escritos em português. Artigos em inglês deverão apresentar apenas abstract.
-  Nos dois casos, o autor deve tomar cuidado para que o resumo (e o abstract)
-  não ultrapassem 10 linhas cada, sendo que ambos devem estar na primeira
-  página do artigo.
+  [texto]
 \end{resumo}
 
 
-\section{General Information}
+\section{Introdução}
 
-All full papers and posters (short papers) submitted to some SBC conference,
-including any supporting documents, should be written in English or in
-Portuguese. The format paper should be A4 with single column, 3.5 cm for upper
-margin, 2.5 cm for bottom margin and 3.0 cm for lateral margins, without
-headers or footers. The main font must be Times, 12 point nominal size, with 6
-points of space before each paragraph. Page numbers must be suppressed.
-
-Full papers must respect the page limits defined by the conference.
-Conferences that publish just abstracts ask for \textbf{one}-page texts.
+[texto]
 
 \section{Fundamentação Teórica} \label{sec:firstpage}
 \subsection{Computação Paralela}
@@ -160,64 +127,62 @@ E_p = \frac{T_s}{pT_p}.
 \subsection{Relação com o Projeto Principal}
 \par Os artigos descritos, para o propósito deste projeto, apresentam não apenas algoritmos eficientes em suas respectivas áreas de ênfase (transposição e multiplicação de matrizes), mas também demonstram, ao longo de suas análises, diversas estratégias de gerenciamento de recursos do sistema para otimizar processos dependentes de matrizes. Dessa forma, mesmo que o presente trabalho não consista em uma reconstrução direta de nenhum dos métodos, ambos os artigos contêm esquemas de particionamento e análise bastante úteis para o desenvolvimento de nosso projeto.
 
-\section{Sections and Paragraphs}
+\section{Implementação}
+\subsection{Implementação em blocos}
 
-Section titles must be in boldface, 13pt, flush left. There should be an extra
-12 pt of space before each title. Section numbering is optional. The first
-paragraph of each section should not be indented, while the first lines of
-subsequent paragraphs should be indented by 1.27 cm.
+\subsection{Método de Strassen}
+\par A segunda implementação escolhida para os testes foi o algoritmo de Strassen para multiplicação de matrizes. Esse algoritmo foi escolhido pois possui algumas propriedades que tornam sua paralelização um caso interessante. Como discutido anteriormente na fundamentação, esse algoritmo efetua multiplicações em matrizes 2x2 utilizando somente 7 operações, isso é interessante devido a essas operações serem independentes entre si, possibilitando a paralelização de sua execução para verificação da eficiência.
+\par As métricas de desempenho utilizadas nessa implementação são as mesmas vistas anteriormente, tempo de execução tanto sequencial quando paralelo, \textit{overhead} paralelo total, \textit{speedup} e eficiência.
+\par O código foi implementado na linguagem C e utiliza o OpenMP para efetuar sua paralelização. \textit{Multithreading} é utilizado para realizar as operações de soma e subtração de matrizes existentes no método de Strassen. Entretanto, algumas restrições foram implementadas para impedir que o custo de gerenciar todas as tarefas existentes não supere o ganho do paralelismo. Como o método de Strassen utiliza recursão, a criação desregulada de tarefas pode rapidamente diminuir a eficiência do programa, por conta disso, uma restrição foi colocada para que novas tarefas sejam criadas somente quando a matriz sendo computada seja de um certo tamanho.
+\par As matrizes utilizadas são geradas de maneira aleatória com dimensão N x N determinada em tempo de execução e cada elemento é povoado com um valor aleatório do tipo \textit{int} com valor variando entre -1000 e 1000.
 
-\subsection{Subsections}
+\section{Resultados}
 
-The subsection titles must be in boldface, 12pt, flush left.
+\subsection{Implementação em blocos}
+\par 
 
-\section{Figures and Captions}\label{sec:figs}
+\subsection{Método de Strassen}
+\par Os testes relacionados ao método de Strassen foram realizados com 3 tamanhos de matrizes diferentes: 100x100, 200x200 e 300x300. Além de 4 quantidades diferentes de threads: 2, 4, 8 e 16.
+\par A figura 1 abaixo mostra os resultados obtidos na multiplicação de matrizes 100x100. É possível perceber que houve um ganho significativo de desempenho ao aumentar o número de threads até 8. Esse é o resultado esperado, visto que a implementação do algoritmo gera 7 tarefas. Como existe uma restrição sobre a criação de novas tarefas relacionada ao tamanho da matriz, o caso com 16 threads não encontrou tarefas suficientes, além de sofrer com o custo do gerenciamento de 16 threads simultâneas, tornando o resultado menos eficiente que o com 8 threads.
 
 
-Figure and table captions should be centered if less than one line
-(Figure~\ref{fig:exampleFig1}), otherwise justified and indented by 0.8cm on
-both margins, as shown in Figure~\ref{fig:exampleFig2}. The caption font must
-be Helvetica, 10 point, boldface, with 6 points of space before and after each
-caption.
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=.5\textwidth]{fig1.jpg}
-\caption{A typical figure}
-\label{fig:exampleFig1}
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Strassen100.jpeg}
+    \caption{Resultados do paralelismo em matrizes 100x100}
+    \label{fig:Strassen100}
 \end{figure}
+\FloatBarrier
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=.3\textwidth]{fig2.jpg}
-\caption{This figure is an example of a figure caption taking more than one
-  line and justified considering margins mentioned in Section~\ref{sec:figs}.}
-\label{fig:exampleFig2}
+\par A figura 2 abaixo mostra os resultados da multiplicação para uma matriz 200x200. Com uma matriz maior, a perda de eficiência do caso com 16 threads foi inferior ao caso anterior, havendo um pequeno ganho de eficiência em comparação com o caso de 8 threads. Entretanto, apesar do \textit{speedup} superior, a eficiência ainda é baixa, devido ao custo de manutenção de todas as threads.
+
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Strassen200.jpeg}
+    \caption{Resultados do paralelismo em matrizes 200x200}
+    \label{fig:Strassen200}
 \end{figure}
+\FloatBarrier
 
-In tables, try to avoid the use of colored or shaded backgrounds, and avoid
-thick, doubled, or unnecessary framing lines. When reporting empirical data,
-do not use more decimal digits than warranted by their precision and
-reproducibility. Table caption must be placed before the table (see Table 1)
-and the font used must also be Helvetica, 10 point, boldface, with 6 points of
-space before and after each caption.
 
-\begin{table}[ht]
-\centering
-\caption{Variables to be considered on the evaluation of interaction
-  techniques}
-\label{tab:exTable1}
-\includegraphics[width=.7\textwidth]{table.jpg}
-\end{table}
+\par Já na figura 3, com uma matriz ainda maior de 300x300, houve novamente um ganho de eficiência para todos os casos, especialmente os casos com 8 e 16 threads. Esse é o resultado esperado e mostra o potencial do paralelismo em casos de multiplicação de matrizes grandes. Apesar da eficiência do caso de 16 threads ainda ser baixa, ele mostrou um \textit{speedup} de mais de 7x, tornando uma execução sequencial de quase 8 segundos em uma execução com paralelismo em pouco mais de 1 segundo.
 
-\section{Images}
 
-All images and illustrations should be in black-and-white, or gray tones,
-excepting for the papers that will be electronically available (on CD-ROMs,
-internet, etc.). The image resolution on paper should be about 600 dpi for
-black-and-white images, and 150-300 dpi for grayscale images.  Do not include
-images with excessive resolution, as they may take hours to print, without any
-visible difference in the result. 
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Strassen300.jpeg}
+    \caption{Resultados do paralelismo em matrizes 300x300}
+    \label{fig:Strassen300}
+\end{figure}
+\FloatBarrier
+
+
+\par Os resultados apresentados mostram, como um todo, que o paralelismo é muito bem aplicado no algoritmo de Strassen, em todos os casos houve um overhead paralelo negativo, mostrando um tempo de execução mais curto para a implementação paralela. Os testes efetuados mostram que o uso de 8 threads gera os resultados mais balanceados entre performance e eficiência, um resultado esperado, visto que o método de Strassen foi paralelizado em suas 7 operações em matrizes independentes.
+
+\section{Conclusão}
+
+[texto]
 
 \bibliographystyle{sbc}
 \bibliography{sbc-template}
