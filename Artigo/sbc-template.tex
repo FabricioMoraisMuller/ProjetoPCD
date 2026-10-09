@@ -8,7 +8,14 @@
 \usepackage[utf8]{inputenc}
 \usepackage{enumitem}
 \usepackage{placeins}
-\usepackage{natbib}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
 
 \hyphenation{english terms to not hyphenize various non repeatable words here something like long word Portuguese}
      
@@ -48,9 +55,9 @@
 
 \section{Fundamentação Teórica} \label{sec:firstpage}
 \subsection{Computação Paralela}
-Do período de 1986 até 2002, o desempenho dos processadores aumentava cerca de 52\% a cada ano \citep{herlihy2008}. No entanto, desde 2002 o crescimento de desempenho das novas gerações de microprocessadores tem desacelerado cada vez mais, isso se deve ao limite físico do silício \citep{hennessy2017}. Desse modo, por volta de 2005, a grande maioria das fabricantes de microprocessadores decidiu que o caminho para o ganho de desempenho estava direcionado à programação paralela \citep{pacheco2011}.
+Do período de 1986 até 2002, o desempenho dos processadores aumentava cerca de 52\% a cada ano \cite{herlihy2008}. No entanto, desde 2002 o crescimento de desempenho das novas gerações de microprocessadores tem desacelerado cada vez mais, isso se deve ao limite físico do silício \cite{hennessy2017}. Desse modo, por volta de 2005, a grande maioria das fabricantes de microprocessadores decidiu que o caminho para o ganho de desempenho estava direcionado à programação paralela \cite{pacheco2011}.
 \par
-\citep{pacheco2011} aponta que na computação paralela "um programa é aquele no qual múltiplas tarefas cooperam intimamente para resolver um problema". Nesse sentido, operações matriciais representam um problema adequado para o paralelismo, já que o cálculo de elementos diferentes podem ser distribuídos em diferentes unidades de execução.
+\cite{pacheco2011} aponta que na computação paralela "um programa é aquele no qual múltiplas tarefas cooperam intimamente para resolver um problema". Nesse sentido, operações matriciais representam um problema adequado para o paralelismo, já que o cálculo de elementos diferentes podem ser distribuídos em diferentes unidades de execução.
 % Se houver espaço
 %\subsection{Threads e Paralelismo}
 %O conceito de \textit{thread} pode ser definido como uma linha de execução de um processo \cite{tanenbaum2016}. Comumente, existem dois tipos de paralelismo, o paralelismo de dados e de tarefas. O paralelismo de dados está relacionado a distribuição de subconjuntos de um mesmo dado entre multíplos processadores. Já o paralelismo de tarefas envolve a distribuição de \textit{threads} entre os núcleos. \cite{silberschatz2018}. Nesse sentido, o problema clássico da  multiplicação de matrizes é explorado como um problema de paralelismo de dados, uma vez que diferentes elementos da matriz resultante podem ser calculados de maneira independente.
@@ -129,6 +136,11 @@ E_p = \frac{T_s}{pT_p}.
 
 \section{Implementação}
 \subsection{Implementação em blocos}
+
+\par A primeira abordagem implementada e avaliada foi o algoritmo de multiplicação de matrizes baseado na estratégia de divisão e conquista (\textit{Divide and Conquer}), estruturado de forma recursiva para o particionamento de submatrizes. Essa técnica foi selecionada por permitir uma divisão estruturada do problema, cujos casos bases são resolvidos por meio de uma rotina paralela customizada que integra diretivas OpenMP e otimização vetorial SIMD.
+\par O código foi desenvolvido na linguagem C++ para poder utilizar templates para os tipos de dados e emprega a biblioteca OpenMP para a paralelização do processamento. Como o particionamento recursivo pode introduzir um custo elevado de gerência de tarefas, implementou-se um parâmetro limiar de corte ($k_c$), garantindo que o paralelismo e a vetorização sejam aplicados de forma equilibrada somente quando as submatrizes atingem dimensões adequadas. Adicionalmente, o framework de testes realiza comparações diretas de exatidão e desempenho com as rotinas altamente otimizadas da biblioteca OpenBLAS (\textit{cblas\_sgemm} para precisão simples e \textit{cblas\_dgemm} para precisão dupla).
+\par Os testes foram conduzidos considerando diferentes dimensões de matrizes quadradas (1000x1000, 2000x2000, 3000x3000 e 4000x4000) e uma variação ampla de valores para o limiar $k_c$. As matrizes de teste são populadas com valores em ponto flutuante gerados aleatoriamente (nos tipos \textit{float} e \textit{double}), utilizando alinhamento de memória específico para favorecer o desempenho das instruções de hardware.
+\par As métricas de desempenho coletadas e analisadas compreendem o tempo de execução sequencial ($T_1$), o tempo de execução paralelo ($T_P$), o \textit{speedup}, a eficiência paralela, o \textit{overhead} paralelo total e o rendimento computacional medido em GFLOPS, permitindo confrontar a solução desenvolvida com os padrões industriais do OpenBLAS.
 
 \subsection{Método de Strassen}
 \par A segunda implementação escolhida para os testes foi o algoritmo de Strassen para multiplicação de matrizes. Esse algoritmo foi escolhido pois possui algumas propriedades que tornam sua paralelização um caso interessante. Como discutido anteriormente na fundamentação, esse algoritmo efetua multiplicações em matrizes 2x2 utilizando somente 7 operações, isso é interessante devido a essas operações serem independentes entre si, possibilitando a paralelização de sua execução para verificação da eficiência.
