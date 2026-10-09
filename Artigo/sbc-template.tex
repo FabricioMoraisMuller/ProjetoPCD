@@ -194,7 +194,9 @@ E_p = \frac{T_s}{pT_p}.
 
 \section{Conclusão}
 
-[texto]
+\par Após a implementação e teste de dois diferentes algoritmos de multiplicação de matrizes, é possível concluir que existe ganho significativo de desempenho para esses algoritmos por meio da execução paralela. Tanto o algoritmo de blocos quanto o algoritmo de Strassen apresentaram um ganho de desempenho significativo, sempre intensificado pelo tamanho das matrizes, com os maiores ganhos ocorrendo em matrizes maiores.
+\par Os testes com diversas quantidades de threads do algoritmo de Strassen mostram que, para esse algoritmo, o uso de 8 threads acança um equilibrio entre speedup e eficiência, obtendo melhorias significativas no tempo de execução, além de seguirem o padrão visto anteriormente de aumento de eficiênciabaseado no tamanho da matriz. A implementação do paralelismo para as 7 operações de matrizes existentes e a grande eficiência encontrada no uso de 8 threads são resultados encorajadores que mostram o potencial dessas implementações.
+\par Os resultados na implementação por blocos demonstram também um forte ganho de eficiência com o uso de paralelismo, com valores de speedup próximos a 8x em algumas instâncias de float e próximo de 9x em algumas instâncias de double. Apesar de alguns problemas de eficiência em casos com blocos pequenos, a estabilização e o ganho de desempenho em blocos maiores mostra o potencial do paralelismo nesse caso também.
 
 \bibliographystyle{sbc}
 \bibliography{sbc-template}
