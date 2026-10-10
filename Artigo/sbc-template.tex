@@ -8,14 +8,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{enumitem}
 \usepackage{placeins}
-
-\usepackage{hyperref}
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    citecolor=blue,
-    urlcolor=blue
-}
+\usepackage{natbib}
+\usepackage{float}
 
 \hyphenation{english terms to not hyphenize various non repeatable words here something like long word Portuguese}
      
@@ -45,19 +39,24 @@
 \maketitle
      
 \begin{resumo} 
-  [texto]
+  A multiplicação de matrizes é uma operação fundamental em diversas áreas da computação e, em sua forma clássica, possui custo $O(n^3)$, o que a torna adequada para técnicas de paralelização e de otimização do acesso à memória. Este trabalho implementa e compara duas abordagens paralelas com OpenMP: uma implementação em blocos, baseada em divisão e conquista com vetorização SIMD e comparada à biblioteca OpenBLAS, e o algoritmo de Strassen, que reduz a complexidade assintótica para $O(n^{\log_{2}7})$. O desempenho foi avaliado por meio do tempo de execução, do \textit{overhead} paralelo total, do \textit{speedup} e da eficiência, variando o tamanho das matrizes e o número de \textit{threads}. Na implementação em blocos, com 16 \textit{threads}, o parâmetro de corte $k_c$ mostrou-se determinante: blocos pequenos resultaram em desempenho reduzido, enquanto blocos maiores alcançaram \textit{speedup} de até 8.66x e eficiência de 54.10\% em matrizes \textit{double} de 4000x4000. No método de Strassen, o uso de 8 \textit{threads} apresentou o melhor equilíbrio entre \textit{speedup} e eficiência, e o \textit{speedup} com 16 \textit{threads} superou 7x em matrizes de 300x300.
 \end{resumo}
 
 
 \section{Introdução}
 
-[texto]
+O desempenho dos processadores crescia cerca de 52\% ao ano até 2002 \citep{herlihy2008}, mas desde então esse ritmo desacelerou devido ao limite físico do silício \citep{hennessy2017}. Por volta de 2005, a maioria dos fabricantes passou a apostar na programação paralela como caminho para novos ganhos de desempenho \citep{pacheco2011}, o que exige que o \textit{software} utilize múltiplos núcleos de maneira eficiente.
+
+Nesse contexto, a multiplicação de matrizes é um problema de grande interesse, por ser uma operação central em áreas como álgebra linear computacional, simulações científicas e aprendizado de máquina. Seu algoritmo clássico possui custo $O(n^3)$ \citep{cormen2012} e, como os elementos da matriz resultante podem ser calculados de forma independente, o problema é adequado ao paralelismo de dados. Contudo, o desempenho também depende do acesso à memória, de modo que a localidade espacial, o uso da \textit{cache} e a vetorização têm papel decisivo \citep{hennessy2017, allen2002}. Por outro lado, algoritmos como o de Strassen reduzem a complexidade assintótica para $O(n^{\log_{2}7})$ \citep{ikenmeyer2019strassen} e, por dividirem o problema em sete multiplicações independentes, também oferecem oportunidades de paralelização, desde que a criação de tarefas seja controlada para que seu custo de gerenciamento não supere o ganho obtido.
+
+O objetivo deste trabalho é implementar e comparar duas abordagens paralelas para a multiplicação de matrizes: uma implementação em blocos, que busca explorar a hierarquia de memória, e o algoritmo de Strassen, que reduz o número de multiplicações por meio de divisão e conquista. Ambas foram desenvolvidas em C/C++, paralelizadas com OpenMP e avaliadas por meio do tempo de execução, do \textit{overhead} paralelo total, do \textit{speedup} e da eficiência \citep{grama2003}, considerando diferentes tamanhos de matrizes e quantidades de \textit{threads}.
+
 
 \section{Fundamentação Teórica} \label{sec:firstpage}
 \subsection{Computação Paralela}
-Do período de 1986 até 2002, o desempenho dos processadores aumentava cerca de 52\% a cada ano \cite{herlihy2008}. No entanto, desde 2002 o crescimento de desempenho das novas gerações de microprocessadores tem desacelerado cada vez mais, isso se deve ao limite físico do silício \cite{hennessy2017}. Desse modo, por volta de 2005, a grande maioria das fabricantes de microprocessadores decidiu que o caminho para o ganho de desempenho estava direcionado à programação paralela \cite{pacheco2011}.
+Do período de 1986 até 2002, o desempenho dos processadores aumentava cerca de 52\% a cada ano \citep{herlihy2008}. No entanto, desde 2002 o crescimento de desempenho das novas gerações de microprocessadores tem desacelerado cada vez mais, isso se deve ao limite físico do silício \citep{hennessy2017}. Desse modo, por volta de 2005, a grande maioria das fabricantes de microprocessadores decidiu que o caminho para o ganho de desempenho estava direcionado à programação paralela \citep{pacheco2011}.
 \par
-\cite{pacheco2011} aponta que na computação paralela "um programa é aquele no qual múltiplas tarefas cooperam intimamente para resolver um problema". Nesse sentido, operações matriciais representam um problema adequado para o paralelismo, já que o cálculo de elementos diferentes podem ser distribuídos em diferentes unidades de execução.
+\citep{pacheco2011} aponta que na computação paralela "um programa é aquele no qual múltiplas tarefas cooperam intimamente para resolver um problema". Nesse sentido, operações matriciais representam um problema adequado para o paralelismo, já que o cálculo de elementos diferentes podem ser distribuídos em diferentes unidades de execução.
 % Se houver espaço
 %\subsection{Threads e Paralelismo}
 %O conceito de \textit{thread} pode ser definido como uma linha de execução de um processo \cite{tanenbaum2016}. Comumente, existem dois tipos de paralelismo, o paralelismo de dados e de tarefas. O paralelismo de dados está relacionado a distribuição de subconjuntos de um mesmo dado entre multíplos processadores. Já o paralelismo de tarefas envolve a distribuição de \textit{threads} entre os núcleos. \cite{silberschatz2018}. Nesse sentido, o problema clássico da  multiplicação de matrizes é explorado como um problema de paralelismo de dados, uma vez que diferentes elementos da matriz resultante podem ser calculados de maneira independente.
@@ -115,24 +114,17 @@ E_p = \frac{T_s}{pT_p}.
 \section{Trabalhos Relacionados}
 
 \subsection{Parallel matrix transpose algorithms on distributed memory concurrent computers}
-
-\par O artigo “Parallel matrix transpose algorithms on distributed memory concurrent computers” \cite{art1} trata da criação de um algorítimo referente à realização de operações de transposição de matrizes utilizando-se de computação paralela.
-\par Para realizar o procedimento, o algoritimo separa os processadores disponíveis em uma matriz de duas dimensões e, utilizando distribuição de dados bloco-cíclica (block cyclic data distribution), divide sub-seções da matriz a serem analisadas por processadores específicos. 
-\par Dependendo da divisão dos processadores na representação 2D, sendo P o número de linhas e Q o número de colunas, duas situações distintas podem ocorrer: o máximo divisor comum (MDC) entre P e Q é calculado. Caso ele seja igual a 1, os números são matematicamente primos, e todos os processadores precisam realizar os procedimentos realizando ‘comunicação total’ entre si. 
-\par Caso o MDC seja maior que 1, o algorítimo divide os blocos de processadores em grupos delimitados pelo MDC, nos quais todas as operações de transposição entre blocos de mesmo grupo podem ocorrer simultaneamente, diminuindo a quantidade total de tempo de execução.
-\par A análise final do algorítimo realizada no artigo demonstra que, em uma múltiplicação de matrizes, transpor o resultado da operação utilizando o processo descrito aumenta em pouco o tempo total de execução. Ademais, o algoritimo se destaca, em principal, ao suportar versatilidade quanto a proporções em grades bidimensionais não quadradas (com P diferente de Q), não só mantendo alta eficiência, mas superando algoritimos restritos a arranjos quadrados.
-\par Um ponto negativo observável no algoritimo, no entanto, possui uma descrição breve no artigo em si. Quando P e Q tem MDC igual a 1 e a comunicação total é realizada, a sua implementação é não só mais lenta do que o método com MDC maior, mas também não se utiliza da melhor implementação possível em teoria. Os autores optam por uma implementação não óptima que, dada a quantidade arbtirariamente grande de processadores, seria mais simples de ser utilizada.
+O trabalho de \cite{art1} propõe algoritmos para a transposição de matrizes em computadores de memória distribuída. Os processadores são organizados em uma grade bidimensional $P \times Q$ e a matriz é distribuída em blocos de forma cíclica (\textit{block cyclic data distribution}). Quando o máximo divisor comum (MDC) entre $P$ e $Q$ é 1, todos os processadores precisam realizar comunicação total entre si; quando é maior que 1, os processadores são divididos em grupos delimitados pelo MDC, e as transposições entre blocos de um mesmo grupo ocorrem simultaneamente, reduzindo o tempo de execução.
+\par
+A análise do artigo mostra que transpor o resultado de uma multiplicação de matrizes com esse procedimento aumenta pouco o tempo total, e que o algoritmo suporta grades não quadradas ($P \neq Q$) mantendo alta eficiência, superando algoritmos restritos a grades quadradas. Como ponto negativo, quando o MDC é 1 a comunicação total é mais lenta e utiliza uma implementação não ótima, escolhida pelos autores por ser mais simples para um número arbitrariamente grande de processadores.
 
 \subsection{Anatomy of High-Performance Matrix Multiplication}
-\par Outro artigo mais diretamente relacionado ao tópico é “Anatomy of High-Performance Matrix Multiplication” \cite{art2}, que discorre diretamente sobre implementações otimizadas de operações de multiplicação de matriz, mais especificamente sobre gerenciar de maneira eficiente a hierarquia de memória disponível para obter alto desempenho de maneira consistente.
-\par Os autores identificam que, nas abordagens mais tradicionais, os algoritimos criados não condizem às capacidades reais do hardware ao mensurar performance, como o número finito de entradas no Translation Look-aside Buffer (TLB) e as latências das memórias cache. O algorítimo proposto, portanto, busca segmentar mais o problema utilizando empacotamento a fim de aproveitar mais a memória no nível local.
-\par Para evitar os gargalos de memória descritos, o sistema proposto reestrutura o algoritimo comum da GEMM (General Matriz Multiplication) em níveis distintos: no mais alto nível, a matriz de entrada é particionada de modo que o painel da matriz A é dimensionado para se ajustar ao cache L2 (ou L3) e ao limite de entradas do TLB, enquanto os blocos da matriz B são empacotados para fluir diretamente pelo cache L1.
-\par Em nível de bloco, os dados lhe atribuídos passam pelo processo de empacotamento, a partir do qual os pacotes são inseridos em buffers temporários contíguos, para que o acesso a eles possa ser mais rápido e direto no processamento.
-\par No micro-kernel, o processamento é realizado em pequenas submatrizes, maximizando a instrução vetorial e o paralelismo ao nível de instrução, O artigo apresenta variados experimentos que demonstram o aumento de desempenho dado por sua abordagem, e é uma base fundamental para análise referente às operações fundamentais de GEMM, e o algorítimo é utilizado em múltiplas bibliotecas atuais de computação de alta performance (HPC), como OpenBLAS  e Intel MKL.
-\par Apesar da alta eficiência do procedimento, um ponto negativo observável é que o processo é bastante elaborado e, portanto, contém overhead significativo. Dado que os procedimentos buscam utilizar o máximo possível de performance, o algoritimo é projetado para uma quantidade grande de processamento necessário e, caso a operação seja simples, as soluções implementadas seriam mais custosas do que óptimas em totalidade.
+O trabalho de \cite{art2} trata de implementações otimizadas da multiplicação de matrizes (GEMM), com foco no gerenciamento eficiente da hierarquia de memória. Os autores observam que algoritmos tradicionais não consideram características reais do hardware, como o número finito de entradas do \textit{Translation Look-aside Buffer} (TLB) e a latência das memórias \textit{cache}. Para evitar esses gargalos, a GEMM é reestruturada em níveis: no mais alto, o painel de $A$ é dimensionado para caber no \textit{cache} L2 (ou L3) e no limite de entradas do TLB, e os blocos de $B$ são empacotados em \textit{buffers} contíguos para fluir pelo \textit{cache} L1; no \textit{micro-kernel}, o processamento ocorre em pequenas submatrizes, maximizando o uso de instruções vetoriais e o paralelismo em nível de instrução.
+\par
+O algoritmo é utilizado em bibliotecas de computação de alto desempenho, como OpenBLAS e Intel MKL. Em contrapartida, o procedimento é elaborado e possui \textit{overhead} significativo, sendo projetado para grandes volumes de processamento: em operações simples, suas soluções seriam mais custosas do que vantajosas.
+\par
+Embora o presente trabalho não reconstrua diretamente nenhum dos métodos descritos, ambos os artigos apresentam esquemas de particionamento e estratégias de gerenciamento de recursos que serviram de referência para o desenvolvimento do projeto.
 
-\subsection{Relação com o Projeto Principal}
-\par Os artigos descritos, para o propósito deste projeto, apresentam não apenas algoritmos eficientes em suas respectivas áreas de ênfase (transposição e multiplicação de matrizes), mas também demonstram, ao longo de suas análises, diversas estratégias de gerenciamento de recursos do sistema para otimizar processos dependentes de matrizes. Dessa forma, mesmo que o presente trabalho não consista em uma reconstrução direta de nenhum dos métodos, ambos os artigos contêm esquemas de particionamento e análise bastante úteis para o desenvolvimento de nosso projeto.
 
 \section{Implementação}
 \subsection{Implementação em blocos}
@@ -143,21 +135,20 @@ E_p = \frac{T_s}{pT_p}.
 \par As métricas de desempenho coletadas e analisadas compreendem o tempo de execução sequencial ($T_1$), o tempo de execução paralelo ($T_P$), o \textit{speedup}, a eficiência paralela, o \textit{overhead} paralelo total e o rendimento computacional medido em GFLOPS, permitindo confrontar a solução desenvolvida com os padrões industriais do OpenBLAS.
 
 \subsection{Método de Strassen}
-\par A segunda implementação escolhida para os testes foi o algoritmo de Strassen para multiplicação de matrizes. Esse algoritmo foi escolhido pois possui algumas propriedades que tornam sua paralelização um caso interessante. Como discutido anteriormente na fundamentação, esse algoritmo efetua multiplicações em matrizes 2x2 utilizando somente 7 operações, isso é interessante devido a essas operações serem independentes entre si, possibilitando a paralelização de sua execução para verificação da eficiência.
+\par A segunda implementação escolhida para os testes foi o algoritmo de Strassen para multiplicação de matrizes. Este foi escolhido pois possui algumas propriedades que tornam sua paralelização um caso relevante. Como discutido anteriormente na fundamentação, o algoritmo efetua multiplicações em matrizes 2x2 utilizando apenas 7 operações. Dado que essas operações são independentes entre si, é possível realizar paralelização de sua execução para comparação de eficiência.
 \par As métricas de desempenho utilizadas nessa implementação são as mesmas vistas anteriormente, tempo de execução tanto sequencial quando paralelo, \textit{overhead} paralelo total, \textit{speedup} e eficiência.
-\par O código foi implementado na linguagem C e utiliza o OpenMP para efetuar sua paralelização. \textit{Multithreading} é utilizado para realizar as operações de soma e subtração de matrizes existentes no método de Strassen. Entretanto, algumas restrições foram implementadas para impedir que o custo de gerenciar todas as tarefas existentes não supere o ganho do paralelismo. Como o método de Strassen utiliza recursão, a criação desregulada de tarefas pode rapidamente diminuir a eficiência do programa, por conta disso, uma restrição foi colocada para que novas tarefas sejam criadas somente quando a matriz sendo computada seja de um certo tamanho.
+
+\par O código foi implementado em C e utiliza OpenMP para efetuar sua paralelização. \textit{Multithreading} é utilizado para realizar as operações de soma e subtração de matrizes no método de Strassen. Porém, algumas restrições foram implementadas para que o custo de gerenciar todas as tarefas existentes não supere o ganho do paralelismo. Como o método utiliza recursão, a criação desregulada de tarefas pode rapidamente diminuir a eficiência do programa, por conta disso uma restrição foi colocada para que novas tarefas sejam criadas somente quando a matriz sendo computada seja de um certo tamanho.
+
 \par As matrizes utilizadas são geradas de maneira aleatória com dimensão N x N determinada em tempo de execução e cada elemento é povoado com um valor aleatório do tipo \textit{int} com valor variando entre -1000 e 1000.
 
 \section{Resultados}
 
 \subsection{Implementação em blocos}
-\par Os testes relacionados à multiplicação de matrizes por blocos foram realizados com 4 tamanhos de matrizes diferentes: 1000x1000, 2000x2000, 3000x3000 e 4000x4000, utilizando 16 threads ativas e variando o tamanho do bloco ($k_c$) para os tipos de dados \textit{float} e \textit{double}. Aqui será apresentado somente as matrizes 1000x1000 e 4000x4000 devido à limitação de espaço. O campo \textit{Ref: cblas\_sgemm} contém os parâmetros de referência para a execução utilizando a biblioteca OpenBLAS.
 
-\par A primeira parte da Tabela~\ref{tab:Blocos1000_4000} apresenta os resultados obtidos para a matriz 1000x1000. Nota-se que tamanhos de blocos muito pequenos ($k_c = 64$ e $96$) resultam em um desempenho reduzido e em um elevado \textit{overhead} devido à granulação inadequada. Conforme o tamanho do bloco aumenta, o desempenho melhora expressivamente, alcançando um \textit{speedup} de até 6.81x para \textit{float} ($k_c = 1000$) e 7.41x para \textit{double} ($k_c = 1000$).
-
-\par \sloppy A segunda parte da Tabela~\ref{tab:Blocos1000_4000} apresenta os testes realizados com matrizes 4000x4000. Neste cenário de maior carga de trabalho, a eficiência máxima ultrapassa 54\% no formato \textit{double} ($k_c = 2000$), com um \textit{speedup} superior a 8.6x. Os dados comprovam que a escolha adequada do parâmetro de bloco $k_c$ é determinante para mitigar o \textit{overhead} de sincronização e maximizar a eficiência do paralelismo em larga escala.
-
-\begin{table}[!htbp]
+\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{table}[H]
     \centering
     \caption{Resultados da implementação em blocos para matrizes de 1000x1000 e 2000x2000}
     \label{tab:Blocos1000_4000}
@@ -210,8 +201,14 @@ E_p = \frac{T_s}{pT_p}.
         4000x4000 & double & 4000 & 18.9490 & 6.75 & 161.1390 & 142.0450 & 8.50 x & 53.15 \% \\ \hline
     \end{tabular}
 \end{table}
+\normalsize
 \FloatBarrier
-\par 
+
+\par Os testes relacionados à multiplicação de matrizes por blocos foram realizados com 4 tamanhos de matrizes diferentes: 1000x1000, 2000x2000, 3000x3000 e 4000x4000, utilizando 16 threads ativas e variando o tamanho do bloco ($k_c$) para os tipos de dados \textit{float} e \textit{double}. Aqui será apresentado somente as matrizes 1000x1000 e 4000x4000 devido à limitação de espaço. O campo \textit{Ref: cblas\_sgemm} contém os parâmetros de referência para a execução utilizando a biblioteca OpenBLAS.
+
+\par A primeira parte da Tabela~\ref{tab:Blocos1000_4000} apresenta os resultados obtidos para a matriz 1000x1000. Nota-se que tamanhos de blocos muito pequenos ($k_c = 64$ e $96$) resultam em um desempenho reduzido e em um elevado \textit{overhead} devido à granulação inadequada. Conforme o tamanho do bloco aumenta, o desempenho melhora expressivamente, alcançando um \textit{speedup} de até 6.81x para \textit{float} ($k_c = 1000$) e 7.41x para \textit{double} ($k_c = 1000$).
+
+\par \sloppy A segunda parte da Tabela~\ref{tab:Blocos1000_4000} apresenta os testes realizados com matrizes 4000x4000. Neste cenário de maior carga de trabalho, a eficiência máxima ultrapassa 54\% no formato \textit{double} ($k_c = 2000$), com um \textit{speedup} superior a 8.6x. Os dados comprovam que a escolha adequada do parâmetro de bloco $k_c$ é determinante para mitigar o \textit{overhead} de sincronização e maximizar a eficiência do paralelismo em larga escala.
 
 \subsection{Método de Strassen}
 \par Os testes relacionados ao método de Strassen foram realizados com 3 tamanhos de matrizes diferentes: 100x100, 200x200 e 300x300. Além de 4 quantidades diferentes de threads: 2, 4, 8 e 16.
@@ -254,8 +251,8 @@ E_p = \frac{T_s}{pT_p}.
 
 \section{Conclusão}
 
-\par Após a implementação e teste de dois diferentes algoritmos de multiplicação de matrizes, é possível concluir que existe ganho significativo de desempenho para esses algoritmos por meio da execução paralela. Tanto o algoritmo de blocos quanto o algoritmo de Strassen apresentaram um ganho de desempenho significativo, sempre intensificado pelo tamanho das matrizes, com os maiores ganhos ocorrendo em matrizes maiores.
-\par Os testes com diversas quantidades de threads do algoritmo de Strassen mostram que, para esse algoritmo, o uso de 8 threads acança um equilibrio entre speedup e eficiência, obtendo melhorias significativas no tempo de execução, além de seguirem o padrão visto anteriormente de aumento de eficiênciabaseado no tamanho da matriz. A implementação do paralelismo para as 7 operações de matrizes existentes e a grande eficiência encontrada no uso de 8 threads são resultados encorajadores que mostram o potencial dessas implementações.
+\par A implementação e os testes dos algoritmos de multiplicação de matrizes por blocos e de Strassen demonstraram ganhos significativos de desempenho com a execução paralela, intensificados pelo aumento do tamanho das matrizes.
+\par Os testes com diversas quantidades de threads do algoritmo de Strassen mostram que, para esse algoritmo, o uso de 8 threads alcança um equilibrio entre speedup e eficiência, obtendo melhorias significativas no tempo de execução, além de seguirem o padrão visto anteriormente de aumento de eficiência baseado no tamanho da matriz. A implementação do paralelismo para as 7 operações de matrizes existentes e a grande eficiência encontrada no uso de 8 threads são resultados encorajadores que mostram o potencial dessas implementações.
 \par Os resultados na implementação por blocos demonstram também um forte ganho de eficiência com o uso de paralelismo, com valores de speedup próximos a 8x em algumas instâncias de float e próximo de 9x em algumas instâncias de double. Apesar de alguns problemas de eficiência em casos com blocos pequenos, a estabilização e o ganho de desempenho em blocos maiores mostra o potencial do paralelismo nesse caso também.
 
 \bibliographystyle{sbc}
